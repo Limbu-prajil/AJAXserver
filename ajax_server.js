@@ -3,7 +3,7 @@ const http = require('http');
 const static = require('node-static');
 const fileServer = new static.Server();
 
-const indexDocument = fs.readFileSync('index.html', 'utf-8')
+//const indexDocument = fs.readFileSync('index.html', 'utf-8')
 
 const requestListener = function (request, response) {
 
@@ -20,16 +20,20 @@ const requestListener = function (request, response) {
         response.writeHead(500);
         response.end(error);
       } else {
-        const documentParts = indexDocument.split('|links|');
-
-        let jsonLinks = '';
-        for (var i = 0; i < fileNames.length; i++) {
-          jsonLinks += '<li><a href="json/' + fileNames[i] + '">' + fileNames[i] + '</a></li>';
-        }
-        response.writeHead(200);
-        response.end(documentParts[0] + jsonLinks + documentParts[1]);
+        //const documentParts = indexDocument.split('|links|');
+        //Reading html asynchronously
+        fs.readFile('index.html', 'utf-8', (error, data)=>{
+          if (error) throw error
+          const documentParts = data.split('|links|');
+          let jsonLinks = '';
+          for (var i = 0; i < fileNames.length; i++) {
+            jsonLinks += '<li><a href="json/' + fileNames[i] + '">' + fileNames[i] + '</a></li>';
+          }
+          response.writeHead(200);
+          response.end(documentParts[0] + jsonLinks + documentParts[1]);
+        })
       }
-    });
+    })
   }
 }
 const server = http.createServer(requestListener);
